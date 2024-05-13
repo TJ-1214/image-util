@@ -1,8 +1,20 @@
 package io.image.util;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+
 public class ImageUtil {
 
-	
 	/*
 	 * 1. **JPEG (Joint Photographic Experts Group)**: - Magic Bytes: FF D8 FF -
 	 * Description: JPEG files typically start with the byte sequence FF D8 FF.
@@ -23,13 +35,13 @@ public class ImageUtil {
 	 * (little-endian) or 4D 4D 00 2A (big-endian) - Description: TIFF files start
 	 * with either 49 49 2A 00 (little-endian) or 4D 4D 00 2A (big-endian).
 	 */
-	
-/**
- * 
- * @param data byte arrays
- * @return Format enum
- */
-	
+
+	/**
+	 * 
+	 * @param data byte arrays
+	 * @return Format enum
+	 */
+
 	public static Format format(byte[] data) {
 
 		if (data.length >= 2 && data[0] == (byte) 0xFF && data[1] == (byte) 0xD8) {
@@ -56,5 +68,78 @@ public class ImageUtil {
 		}
 		return Format.UNKNOWN;
 	}
-	
+
+	/**
+	 * 
+	 * @param data bytes array
+	 * @return bytes array
+	 * @throws IOException
+	 */
+
+	public static byte[] compress(byte[] data) throws IOException {
+//		detect image type
+		Format format = ImageUtil.format(data);
+
+//		convert to input stream
+		InputStream inputImage = new ByteArrayInputStream(data);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		BufferedImage image = ImageIO.read(inputImage);
+		
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(format.toString());
+
+		if (writers.hasNext()) {
+			ImageWriter writer = writers.next();
+			ImageWriteParam params = writer.getDefaultWriteParam();
+			params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			params.setCompressionQuality(CompressionQuality.BALANCED.getSize());
+		
+			writer.setOutput(new MemoryCacheImageOutputStream(outputStream)); // Set the output for the writer
+			writer.write(null, new IIOImage(image, null, null), params); // Write image with compression parameters
+
+			writer.dispose();
+		}
+		return outputStream.toByteArray();
+	}
+
+	/**
+	 * 
+	 * @param data
+	 * @param quality
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] compress(byte[] data, CompressionQuality quality) throws IOException {
+		if (quality == null) {
+			throw new NullPointerException("Compression is null");
+		}
+
+//		detect image type
+		Format format = ImageUtil.format(data);
+
+//		convert to input stream
+		InputStream inputImage = new ByteArrayInputStream(data);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		BufferedImage image = ImageIO.read(inputImage);
+
+		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(format.toString());
+
+		if (writers.hasNext()) {
+			ImageWriter writer = writers.next();
+			ImageWriteParam params = writer.getDefaultWriteParam();
+			params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+
+			params.setCompressionQuality(quality.getSize());
+
+			writer.setOutput(new MemoryCacheImageOutputStream(outputStream)); // Set the output for the writer
+			writer.write(null, new IIOImage(image, null, null), params); // Write image with compression parameters
+
+			writer.dispose();
+		}
+		return outputStream.toByteArray();
+	}
+
 }
