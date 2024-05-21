@@ -1,7 +1,7 @@
 
 ---
 
-# Image Util Library - Version 1.0.0
+# Image Util Library - Version 1.0.1
 
 This is a lightweight Java library for handling image input and output operations efficiently. It offers simple yet powerful functionalities to work with various image formats.
 
