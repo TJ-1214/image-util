@@ -6,6 +6,10 @@
 	<groupId>io.tj</groupId>
 	<artifactId>io.image</artifactId>
 
+<scm>
+    <connection>scm:git:https://github.com/TJ-1214/image-util.git</connection>
+    <url>https://github.com/TJ-1214/image-util</url>
+  </scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.report.sourceEncoding>UTF-8</project.report.sourceEncoding>
