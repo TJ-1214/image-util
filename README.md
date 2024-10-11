@@ -13,7 +13,7 @@ To use this library in your Java project, add the following dependency to your p
 <dependency>
     <groupId>io.tj</groupId>
     <artifactId>io.image</artifactId>
-    <version>1.0.0</version>
+    <version>[version]</version>
 </dependency>
 ```
 
